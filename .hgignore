@@ -3,11 +3,7 @@ syntax: glob
 
 _ReSharper.*
 obj
-ipch
 bin
-bin20
-bin35
-bin40
 Bin
 Debug
 Release
@@ -24,5 +20,5 @@ Release
 *.sdf
 *.zip
 *.mdf
-.svn
 *.snk
+
