@@ -1,0 +1,64 @@
+
+div.searchresults {
+    font-size: 12pt;
+}
+
+div.searchitem {
+    padding-bottom: 20px;
+}
+
+div.searchitem * {
+    display: inline;
+}
+
+div.searchitem .searchentry {
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+div.searchitem .searchdesc {
+    color: Gray;
+}
+
+div.searchitem .searchinfo {
+    display: block;
+    font-size: smaller;
+    padding-top: 2px;
+}
+
+div.searchitem .searchinfo .searchrank {
+    color: silver;
+}
+
+div.searchitem .searchinfo .searchsize {
+    color: silver;
+}
+
+div.searchitem .searchinfo .searchurl {
+    color: silver;
+}
+
+div.searchitem .searchinfo .searchurl .searchlink {
+    color: #004000;
+}
+
+div.searchnavbar {
+    text-align: center;
+    border-top: solid 1px #e0e0e0;
+    margin-top: 10px;
+    padding-top: 5px;
+}
+
+div.searchnavbar a.disabled {
+    color: silver;
+}
+
+div.searchnavbar a.searchlink {
+    display: inline-block;
+    min-width: 40px;
+}
+
+div.searchnavbar a.selected {
+    font-size: larger;
+    font-weight: bold;
+}

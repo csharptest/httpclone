@@ -1,0 +1,14 @@
+package CSharpTest.Net.HttpClone;
+
+import "ContentRecord.proto";
+
+message ContentSearchResult
+{
+    required uint32 ranking = 1;
+    required string uri = 2;
+    optional string title = 3;
+    optional string blurb = 4;
+    optional datetime modified = 5;
+    
+    optional ContentRecord record = 15;
+}

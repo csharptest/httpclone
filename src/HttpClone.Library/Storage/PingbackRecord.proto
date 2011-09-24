@@ -1,0 +1,13 @@
+package CSharpTest.Net.HttpClone;
+
+message PingbackRecord
+{
+    repeated PingbackInfo records = 15;
+}
+    
+message PingbackInfo
+{
+    required string source_uri = 1;
+    required string target_uri = 2;
+    optional datetime when = 3;
+}

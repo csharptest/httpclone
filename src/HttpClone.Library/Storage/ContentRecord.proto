@@ -1,0 +1,25 @@
+package CSharpTest.Net.HttpClone;
+
+message ContentRecord
+{
+    required bytes id = 1;
+    required string content_uri = 2;
+    optional string content_redirect = 3;
+    optional string content_type = 4;
+    optional uint32 content_length = 5;
+    optional uint32 http_status = 6;
+
+    optional string e_tag = 17;
+    optional datetime last_valid = 18;
+    optional datetime last_crawled = 19;
+    optional datetime date_created = 20;
+    optional datetime date_modified = 21;
+    
+    optional string hash_original = 30;
+    optional string hash_contents = 31;
+    
+    optional uint32 compressed_length = 40;
+    optional fixed64 content_store_id = 41;
+    
+    optional fixed64 crawling_instance = 50;
+}

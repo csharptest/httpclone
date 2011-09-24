@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0D9411B0-0696-4B02-A353-E9F74A80E697}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>App.ico</ApplicationIcon>
+    <AssemblyName>HttpClone</AssemblyName>
+    <DelaySign>false</DelaySign>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\keyfile\httpclone.snk</AssemblyOriginatorKeyFile>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CSharpTest.Net.HttpClone</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\bin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\bin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CSharpTest.Net.BPlusTree, PublicKeyToken=06aee00cce822474">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\CSharpTest.Net.BPlusTree.dll</HintPath>
+    </Reference>
+    <Reference Include="CSharpTest.Net.Library, PublicKeyToken=06aee00cce822474">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\CSharpTest.Net.Library.dll</HintPath>
+    </Reference>
+    <Reference Include="CSharpTest.Net.Logging, PublicKeyToken=06aee00cce822474">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\CSharpTest.Net.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers, PublicKeyToken=17b3b1f090c3ea48">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip.Reduced, PublicKeyToken=edbe51ad942a3f5c">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, PublicKeyToken=20d6fb77ed23b869">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App.ico" />
+    <None Include="Resources\search_css.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="HttpCloneConfig.xsd">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HttpCloneConfig.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Commands\LinkManagement.cs" />
+    <Compile Include="Commands\PageManagement.cs" />
+    <Compile Include="Commands\SiteManagement.cs" />
+    <Compile Include="Commands\Exporting.cs" />
+    <Compile Include="Commands\Optimizing.cs" />
+    <Compile Include="Commands\Publishing.cs" />
+    <Compile Include="Commands\Pingbacks.cs" />
+    <Compile Include="Commands\SearchAndIndexing.cs" />
+    <Compile Include="Commands\ViewAndEdit.cs" />
+    <Compile Include="Commands\KeyManagement.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Commands\CommandLine.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="ConfirmPrompt.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Publishing\ContentIndexing.cs" />
+    <Compile Include="Publishing\ContentOptimizier.cs" />
+    <Compile Include="Publishing\SaveNotModified.cs" />
+    <Compile Include="Publishing\MimeInfoMap.cs" />
+    <Compile Include="Publishing\SaveContent.cs" />
+    <Compile Include="Publishing\FetchUrl.cs" />
+    <Compile Include="Publishing\SaveHttpError.cs" />
+    <Compile Include="Publishing\SaveRedirect.cs" />
+    <Compile Include="Publishing\SearchTemplateBuilder.cs" />
+    <Compile Include="Publishing\SiteConverter.cs" />
+    <Compile Include="Publishing\SitePublisher.cs" />
+    <Compile Include="Publishing\TaskCounter.cs" />
+    <Compile Include="Publishing\ContentParser.cs" />
+    <Compile Include="HttpCloneConfig.cs">
+      <Generator>CmdTool</Generator>
+      <LastGenOutput>HttpCloneConfig.xsd</LastGenOutput>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Publishing\SiteCollector.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HttpClone.Hosting\HttpClone.Hosting.csproj">
+      <Project>{AD9411B0-0696-4B02-A353-E9F74A80E697}</Project>
+      <Name>HttpClone.Hosting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HttpClone.Library\HttpClone.Library.csproj">
+      <Project>{BD9411B0-0696-4B02-A353-E9F74A80E697}</Project>
+      <Name>HttpClone.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

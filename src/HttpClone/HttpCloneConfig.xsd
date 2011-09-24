@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="HttpCloneConfig" nillable="true" type="HttpCloneConfig" />
+  <xs:complexType name="HttpCloneConfig">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="exclude" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="include" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" default="[^\w]+" name="bad-name-chars-expression" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="search" type="HttpCloneSearching" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="doc-type" type="HttpCloneDocType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneSearching">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="xpath-base" type="HttpCloneXPath" />
+      <xs:element minOccurs="0" maxOccurs="1" name="form" type="HttpCloneXPath" />
+      <xs:element minOccurs="0" maxOccurs="1" name="title" type="HttpCloneXPathBlurb" />
+      <xs:element minOccurs="0" maxOccurs="1" name="blurb" type="HttpCloneXPathBlurb" />
+      <xs:element minOccurs="0" maxOccurs="1" name="date" type="HttpCloneXPathDate" />
+      <xs:element minOccurs="0" maxOccurs="1" name="terms-xpath" type="HttpCloneXPathReplace" />
+      <xs:element minOccurs="0" maxOccurs="1" name="results-xpath" type="HttpCloneXPathReplace" />
+      <xs:element minOccurs="0" maxOccurs="1" name="index" type="ArrayOfHttpCloneXPath" />
+      <xs:element minOccurs="0" maxOccurs="1" name="exclude" type="ArrayOfHttpCloneXPath1" />
+    </xs:sequence>
+    <xs:attribute name="template-uri" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="HttpCloneXPath">
+    <xs:attribute name="xpath" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="HttpCloneXPathReplace">
+    <xs:complexContent mixed="false">
+      <xs:extension base="HttpCloneXPath">
+        <xs:attribute name="replace" type="ReplaceOption" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="ReplaceOption">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="replace" />
+      <xs:enumeration value="append" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="HttpCloneXPathDate">
+    <xs:complexContent mixed="false">
+      <xs:extension base="HttpCloneXPath">
+        <xs:attribute name="format" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneXPathBlurb">
+    <xs:complexContent mixed="false">
+      <xs:extension base="HttpCloneXPath">
+        <xs:attribute default="512" name="max-length" type="xs:int" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfHttpCloneXPath">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="add" nillable="true" type="HttpCloneXPath" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfHttpCloneXPath1">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="if" nillable="true" type="HttpCloneXPath" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneDocType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="HttpCloneFileType">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" name="title" type="HttpCloneMatch" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="alias" type="HttpCloneFileType" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="match" type="HttpCloneMatch" />
+          <xs:element minOccurs="0" maxOccurs="1" name="optimizing" type="HttpCloneOptimizations" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="tag" type="HttpCloneDocumentTag" />
+        </xs:sequence>
+        <xs:attribute name="type" type="ContentFormat" use="required" />
+        <xs:attribute default="false" name="relative-links" type="xs:boolean" />
+        <xs:attribute default="false" name="text-links" type="xs:boolean" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneFileType">
+    <xs:attribute name="ext" type="xs:string" />
+    <xs:attribute name="mime" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="HttpCloneMatch">
+    <xs:attribute name="expression" type="xs:string" />
+    <xs:attribute default="1" name="group_id" type="xs:int" />
+  </xs:complexType>
+  <xs:complexType name="HttpCloneOptimizations">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="remove" type="HttpCloneOptimizationItem" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="replace" type="HttpCloneOptimizationReplace" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneOptimizationItem">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element minOccurs="0" maxOccurs="1" name="match" type="HttpCloneMatch" />
+        <xs:element minOccurs="0" maxOccurs="1" name="xpath" type="HttpCloneXPath" />
+        <xs:element minOccurs="0" maxOccurs="1" name="tag" type="HttpCloneTag" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneTag">
+    <xs:attribute name="ancestor" type="xs:string" />
+    <xs:attribute name="name" type="xs:string" />
+    <xs:attribute name="where" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="HttpCloneDocumentTag">
+    <xs:complexContent mixed="false">
+      <xs:extension base="HttpCloneTag">
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="attribute" type="HttpCloneTagAttribute" />
+        </xs:sequence>
+        <xs:attribute name="mime" type="xs:string" />
+        <xs:attribute name="follow" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HttpCloneTagAttribute">
+    <xs:attribute name="name" type="xs:string" />
+    <xs:attribute name="mime" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="HttpCloneOptimizationReplace">
+    <xs:complexContent mixed="false">
+      <xs:extension base="HttpCloneOptimizationItem">
+        <xs:attribute default="" name="value" type="xs:string" />
+        <xs:attribute default="false" name="expand" type="xs:boolean" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="ContentFormat">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="unknown" />
+      <xs:enumeration value="xml" />
+      <xs:enumeration value="html" />
+      <xs:enumeration value="text" />
+      <xs:enumeration value="binary" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
