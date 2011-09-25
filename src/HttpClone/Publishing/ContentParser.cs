@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using CSharpTest.Net.Interfaces;
 using CSharpTest.Net.Utils;
 using CSharpTest.Net.HttpClone.Storage;
 using CSharpTest.Net.Html;
@@ -26,7 +25,7 @@ using System.Xml;
 
 namespace CSharpTest.Net.HttpClone.Publishing
 {
-    class ContentParser
+    public class ContentParser
     {
         private static readonly Regex IsHtml = new Regex(@"<html[\s>]", RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private const string MimeTagDivide = ";tag=";

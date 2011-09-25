@@ -14,7 +14,6 @@
 #endregion
 
 using System;
-using System.ComponentModel;
 using System.IO;
 using CSharpTest.Net.Commands;
 using CSharpTest.Net.HttpClone.Publishing;
@@ -24,22 +23,27 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void Update(string site, [DefaultValue(null)]string source)
+        [Command(Category = "Websites", Description = "Crawl, Optimize, Deduplicate, and Index the website provided.")]
+        public void UpdateSite(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("source", DefaultValue = null, Description = "Overrides the source http address.")]
+            string source)
         {
-            Crawl(source ?? site);
+            CrawlSite(source ?? site);
             if (source != site)
-                CopyTo(source, site);
-            Build(site);
-        }
+                CopySite(source, site, true);
 
-        public void Build(string site)
-        {
+            Optimize(site, false);
+            Deduplicate(site, false, false);
             Index(site);
             MakeSearchTemplate(site);
-            Optimize(site, false);
         }
 
-        public void Crawl(string site)
+        [Command(Category = "Websites", Description = "Crawl the website provided and store any changed content.")]
+        public void CrawlSite(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site)
         {
             using (SiteCollector index = new SiteCollector(StoragePath(site), site))
             {
@@ -52,7 +56,12 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void DeleteSite(string site, [DefaultValue(false)]bool noPrompt)
+        [Command(Category = "Websites", Description = "Delete the specified website copy.")]
+        public void DeleteSite(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("noprompt", "q", DefaultValue = false, Description = "True to suppress confirmation message.")]
+            bool noPrompt)
         {
             if (noPrompt || new ConfirmPrompt().Question("Are you sure you want to remove this site", "yes", "no") == "yes")
             {
@@ -71,21 +80,19 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void CopyTo(string original, string target)
+        [Command(Category = "Websites", Description = "Copy one website to another changing all links to the original to the target.")]
+        public void CopySite(
+            [Argument("site", "s", Description = "The root http address of the website to copy.")]
+            string original,
+            [Argument("target", "t", Description = "The root http address of the destination website.")]
+            string target,
+            [Argument("overwrite", "y", DefaultValue = false, Description = "True to overwrite any existing content.")]
+            bool overwrite)
         {
             using (SiteConverter index = new SiteConverter(StoragePath(original), original))
             using (ContentStorage writer = new ContentStorage(StoragePath(target), false))
             {
-                index.Overwrite = true;
-                index.ConvertTo(target, writer);
-            }
-        }
-
-        public void Rename(string original, string target)
-        {
-            using (SiteConverter index = new SiteConverter(StoragePath(original), original))
-            using (ContentStorage writer = new ContentStorage(StoragePath(target), false))
-            {
+                index.Overwrite = overwrite;
                 index.ConvertTo(target, writer);
             }
         }

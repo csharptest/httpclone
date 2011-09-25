@@ -15,28 +15,62 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Net;
 using CSharpTest.Net.Commands;
-using CSharpTest.Net.Crypto;
-using CSharpTest.Net.HttpClone.Common;
 using CSharpTest.Net.HttpClone.Publishing;
 using CSharpTest.Net.HttpClone.Storage;
-using CSharpTest.Net.Interfaces;
 using CSharpTest.Net.IO;
 
 namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void Remove(string url)
+        [Command(Category = "Content", Description = "Removes a single page from the site.")]
+        public void Remove(
+            [Argument("page", "p", Description = "The full http address of the page you want to remove.")]
+            string url)
         {
             using (ContentStorage store = new ContentStorage(StoragePath(url), false))
                 store.Remove(new Uri(url, UriKind.Absolute).NormalizedPathAndQuery());
         }
 
-        public void DedupContent(string site, [DefaultValue(false)]bool remove, [DefaultValue(false)]bool noPrompt)
+        [Command(Category = "Content", Description = "Rename a content url from one location to another.")]
+        public void Rename(
+            [Argument("page", "p", Description = "The full http address of the page to move the source content to.")]
+            string targetLink,
+            [Argument("source", "s", Description = "The full http address of the page you want to move.")]
+            string sourceLink,
+            [Argument("redirect", "r", DefaultValue = true, Description = "True to insert a redirect after moving the content.")]
+            bool redirect)
+        {
+            Uri targetUri = new Uri(targetLink, UriKind.Absolute);
+            Uri sourceUri = new Uri(sourceLink, UriKind.Absolute);
+            Check.Assert<InvalidOperationException>(sourceUri.IsSameHost(targetUri), "The source and target should be in the same site.");
+
+            using (ContentStorage store = new ContentStorage(StoragePath(sourceLink), false))
+            {
+                store.Rename(sourceUri.NormalizedPathAndQuery(), targetUri.NormalizedPathAndQuery());
+                if (redirect)
+                {
+                    DateTime time = DateTime.Now;
+                    ContentRecord.Builder builder = store.New(sourceUri.NormalizedPathAndQuery(), time);
+                    builder
+                        .SetHttpStatus((uint) HttpStatusCode.Redirect)
+                        .SetContentRedirect(targetUri.NormalizedPathAndQuery())
+                        ;
+                    store.Add(builder.ContentUri, builder.Build());
+                }
+            }
+        }
+
+        [Command(Category = "Content", Description = "Search the site for duplicate content and redirect or remove the duplicates.")]
+        public void Deduplicate(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("remove", "r", DefaultValue = false, Description = "True to remove the page and modify source links, otherwise inserts a redirect.")]
+            bool remove,
+            [Argument("noprompt", "q", DefaultValue = false, Description = "True to stop prompt for confirmation before changing content.")]
+            bool noPrompt)
         {
             using (ContentStorage store = new ContentStorage(StoragePath(site), false))
             {
@@ -61,16 +95,19 @@ namespace CSharpTest.Net.HttpClone.Commands
                     (noPrompt || new ConfirmPrompt().Continue("Replace all of the above links")))
                 {
                     Uri baseUri = new Uri(site, UriKind.Absolute);
-                    ContentParser parser = new ContentParser(store, baseUri);
-                    parser.RewriteUri += u =>
-                    {
-                        string target;
-                        if (u.IsSameHost(baseUri) && replacements.TryGetValue(u.NormalizedPathAndQuery(), out target))
-                            return new Uri(baseUri, target);
-                        return u;
-                    };
-                    parser.ProcessAll();
 
+                    if (remove)
+                    {
+                        ContentParser parser = new ContentParser(store, baseUri);
+                        parser.RewriteUri += u =>
+                        {
+                            string target;
+                            if (u.IsSameHost(baseUri) && replacements.TryGetValue(u.NormalizedPathAndQuery(), out target))
+                                return new Uri(baseUri, target);
+                            return u;
+                        };
+                        parser.ProcessAll();
+                    }
                     foreach (string removed in replacements.Keys)
                     {
                         ContentRecord rec = store[removed];
@@ -94,7 +131,32 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void AddRecursive(string targetLink, string sourceLink)
+        [Command(Category = "Content", Description = "Imports a url, and then modified all links to source to point to the target page.")]
+        public void Internalize(
+            [Argument("page", "p", Description = "The full http address of the page to save the source content to.")]
+            string targetLink,
+            [Argument("source", "s", Description = "The full http address of the page you want to import.")]
+            string sourceLink,
+            [Argument("recursive", "r", DefaultValue = false, Description = "True to recursivly import all links within the same domain.")]
+            bool recursive,
+            [Argument("noprompt", "q", DefaultValue = false, Description = "True to stop prompt for confirmation before overwriting content.")]
+            bool noPrompt)
+        {
+            Import(targetLink, sourceLink, recursive, noPrompt);
+            Relink(targetLink, sourceLink, targetLink);
+        }
+
+        [Command(Category = "Content", Description = "Imports a url to a specified page.")]
+        public void Import(
+            [Argument("page", "p", Description = "The full http address of the page to save the source content to.")]
+            string targetLink,
+            [Argument("source", "s", Description = "The full http address of the page you want to import.")]
+            string sourceLink,
+            [Argument("recursive", "r", DefaultValue = false, Description = "True to recursivly import all links within the same domain.")]
+            bool recursive,
+            [Argument("noprompt", "q", DefaultValue = false, Description = "True to stop prompt for confirmation before overwriting content.")]
+            bool noPrompt
+            )
         {
             Uri targetUri = new Uri(targetLink, UriKind.Absolute);
             using (TempDirectory tempFolder = new TempDirectory())
@@ -102,7 +164,7 @@ namespace CSharpTest.Net.HttpClone.Commands
             {
                 bool exists = writer.ContainsKey(targetUri.NormalizedPathAndQuery());
                 if (exists)
-                    if (!new ConfirmPrompt().Continue("Overwrite " + targetUri.NormalizedPathAndQuery()))
+                    if (!noPrompt && !new ConfirmPrompt().Continue("Overwrite " + targetUri.NormalizedPathAndQuery()))
                         return;
 
                 Uri sourceUri = new Uri(sourceLink, UriKind.Absolute);
@@ -110,7 +172,13 @@ namespace CSharpTest.Net.HttpClone.Commands
                 {
                     index.NoDefaultPages = true;
                     index.UpdateSearchTemplate = false;
-                    index.CrawlSite();
+                    if (recursive)
+                        index.CrawlSite();
+                    else
+                    {
+                        index.AddUrlsFound = false;
+                        index.CrawlPage(sourceUri.NormalizedPathAndQuery());
+                    }
                 }
 
                 using (SiteConverter index = new SiteConverter(tempFolder.TempPath, sourceLink))
@@ -123,100 +191,6 @@ namespace CSharpTest.Net.HttpClone.Commands
                     writer.Remove(targetUri.NormalizedPathAndQuery());
                 writer.Rename(sourceUri.NormalizedPathAndQuery(), targetUri.NormalizedPathAndQuery());
             }
-        }
-
-        public void Add(string targetLink, string sourceLink, [DefaultValue(true)]bool fixRelativeLinks)
-        {
-            AddFrom(targetLink, sourceLink, parser =>
-                //All imported links must be absolute
-                parser.RewriteUri += uri => new Uri(uri.OriginalString, UriKind.Absolute)
-            );
-        }
-
-        private void AddFrom(string targetLink, string sourceLink, Action<ContentParser> rewrite)
-        {
-            DateTime timestamp = DateTime.Now;
-            Uri targetUri = new Uri(targetLink, UriKind.Absolute);
-            using (ContentStorage storage = new ContentStorage(StoragePath(targetLink), false))
-            {
-                string relpath = targetUri.NormalizedPathAndQuery();
-                    
-                ContentRecord rec;
-                if (!storage.TryGetValue(relpath, out rec))
-                {
-                    rec = storage.New(relpath, timestamp).BuildPartial();
-                }
-                else if(!new ConfirmPrompt().Continue("Overwrite the existing uri"))
-                    return;
-
-                Uri location;
-                if (!Uri.TryCreate(sourceLink, UriKind.Absolute, out location))
-                {
-                    if (File.Exists(Path.Combine(Environment.CurrentDirectory, sourceLink)))
-                    {
-                        sourceLink = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, sourceLink));
-                        location = new Uri(sourceLink, UriKind.Absolute);
-                    }
-                    else throw new ApplicationException("Unable to identify source link: " + sourceLink);
-                }
-                string contentType;
-                byte[] contents;
-                ContentRecord.Builder builder = rec.ToBuilder();
-
-                if (location.IsFile || location.IsUnc)
-                {
-                    contentType = new MimeInfoMap(targetUri, StoragePath(targetLink))
-                        .FromExtension(Path.GetExtension(location.OriginalString));
-                    contents = File.ReadAllBytes(location.OriginalString);
-                    builder.SetHttpStatus(200);
-                    builder.ClearETag();
-                }
-                else
-                {
-                    HttpRequestUtil http = new HttpRequestUtil(location);
-                    if (http.Get(location.PathAndQuery) != HttpStatusCode.OK)
-                        throw new ApplicationException(String.Format("The source link returned {0}/{1}.", (int)http.StatusCode, http.StatusCode));
-                    contentType = http.ContentType;
-                    contents = http.Content;
-                    builder.SetHttpStatus((uint)http.StatusCode);
-                    if (!String.IsNullOrEmpty(http.ETag))
-                        builder.SetETag(http.ETag);
-                }
-
-                string hashString = Hash.SHA256(contents).ToString();
-                if(builder.HashOriginal != hashString)
-                    builder.SetDateModified(timestamp);
-                builder
-                    .SetLastCrawled(timestamp)
-                    .SetLastValid(timestamp)
-                    .ClearContentRedirect()
-                    .SetContentType(contentType)
-                    .SetContentLength((uint)contents.Length)
-                    .SetHashOriginal(hashString);
-
-                if (rewrite != null)
-                {
-                    Uri srcUri = new Uri(sourceLink, UriKind.Absolute);
-                    Uri srcBase = new Uri(srcUri, "./");
-                    rec = builder.Clone().SetContentUri(srcBase.MakeRelativeUri(srcUri).OriginalString).Build();
-
-                    ContentParser parser = new ContentParser(storage, targetUri, srcBase);
-                    rewrite(parser);
-                    contents = parser.ProcessFile(rec, contents);
-                }
-
-                using (ITransactable trans = storage.WriteContent(builder, contents))
-                {
-                    if (storage.AddOrUpdate(builder.ContentUri, builder.Build()))
-                        trans.Commit();
-                }
-            }
-        }
-
-        public void Internalize(string targetLink, string sourceLink)
-        {
-            AddRecursive(targetLink, sourceLink);
-            Relink(targetLink, sourceLink, targetLink);
         }
     }
 }

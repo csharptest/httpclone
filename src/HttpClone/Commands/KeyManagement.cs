@@ -16,9 +16,9 @@
 using System;
 using System.IO;
 using System.Text;
-using System.ComponentModel;
 using CSharpTest.Net.Commands;
 using CSharpTest.Net.Crypto;
+using CSharpTest.Net.HttpClone.Publishing;
 using CSharpTest.Net.Utils;
 using CSharpTest.Net.HttpClone.Common;
 
@@ -30,12 +30,12 @@ namespace CSharpTest.Net.HttpClone.Commands
         public void CreateKeys(
             [Argument("site", "s", Description = "The root http address of the website copy.")]
             string url,
-            [Argument("key-size", "k", Description = "The size, in bits, of the RSA cryptographic keys to produce.")]
-            [DefaultValue(4096)]int keySize,
-            [Argument("password", "p", Description = "The client password used for access to the RSA publishing key.")]
-            [DefaultValue(null)] string clientKeyPassword,
-            [Argument("NoServerPassword", Description = "Do not generate or require a password for the server's RSA publishing key.")]
-            [DefaultValue(false)] bool noServerPassword)
+            [Argument("key-size", "k", DefaultValue = 4096, Description = "The size, in bits, of the RSA cryptographic keys to produce.")]
+            int keySize,
+            [Argument("password", "p", DefaultValue = null, Description = "The client password used for access to the RSA publishing key (Empty for prompt).")]
+            string clientKeyPassword,
+            [Argument("NoServerPassword", DefaultValue = false, Description = "Do not generate or require a password for the server's RSA publishing key.")]
+            bool noServerPassword)
         {
             ConfirmPrompt prompt = new ConfirmPrompt();
             string path = StoragePath(url);
@@ -45,6 +45,12 @@ namespace CSharpTest.Net.HttpClone.Commands
             string clientFile = Path.Combine(path, "client-publishing.key");
             if (File.Exists(clientFile) && !prompt.Continue("Overwrite existing file " + clientFile))
                 return;
+
+            if (clientKeyPassword == "")
+            {
+                GetPassword("Enter password: ", p => clientKeyPassword = p);
+                GetPassword("Confirm password: ", p => Check.Assert<ArgumentException>(clientKeyPassword == p, "The passwords do not match."));
+            }
 
             byte[] serverPassBytes = new byte[48];
             new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(serverPassBytes);
@@ -125,6 +131,26 @@ NEXT STEPS:
                     }
                 }
                 Console.WriteLine("FAILURE: You need verify the key file or check the server and try again.");
+            }
+        }
+
+        private void GetPassword(string prompt, Action<string> setpassword)
+        {
+            using (new ConsoleEchoOff())
+            {
+                for (int i = 2; i >= 0; i--)
+                {
+                    try
+                    {
+                        Console.Write(prompt);
+                        setpassword(Console.ReadLine());
+                        break;
+                    }
+                    catch
+                    { if (i == 0) throw; }
+                    finally
+                    { Console.WriteLine(); }
+                }
             }
         }
     }

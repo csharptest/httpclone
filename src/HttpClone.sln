@@ -10,11 +10,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BE484F
 		..\build.bat = ..\build.bat
 		CmdTool.config = CmdTool.config
 		..\example.bat = ..\example.bat
+		..\HttpClone-Help.html = ..\HttpClone-Help.html
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClone.Hosting", "HttpClone.Hosting\HttpClone.Hosting.csproj", "{AD9411B0-0696-4B02-A353-E9F74A80E697}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClone.Library", "HttpClone.Library\HttpClone.Library.csproj", "{BD9411B0-0696-4B02-A353-E9F74A80E697}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClone.Test", "HttpClone.Test\HttpClone.Test.csproj", "{ED9411B0-0696-4B02-A353-E9F74A80E697}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +39,10 @@ Global
 		{BD9411B0-0696-4B02-A353-E9F74A80E697}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD9411B0-0696-4B02-A353-E9F74A80E697}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD9411B0-0696-4B02-A353-E9F74A80E697}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED9411B0-0696-4B02-A353-E9F74A80E697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED9411B0-0696-4B02-A353-E9F74A80E697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED9411B0-0696-4B02-A353-E9F74A80E697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED9411B0-0696-4B02-A353-E9F74A80E697}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

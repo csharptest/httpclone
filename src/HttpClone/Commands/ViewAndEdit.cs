@@ -29,12 +29,18 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void Dump(string url)
+        [Command(Category = "Viewing", Description = "Print the details about the content to the console.")]
+        public void Dump(
+            [Argument("page", "p", Description = "The http address of the web page.")]
+            string url)
         {
             With(url, (s, r) => Console.WriteLine(r.ToString()));
         }
 
-        public void Type(string url)
+        [Command(Category = "Viewing", Description = "Print the content url to the console.")]
+        public void Type(
+            [Argument("page", "p", Description = "The http address of the web page.")]
+            string url)
         {
             With(url, 
                 (s, r) =>
@@ -46,17 +52,26 @@ namespace CSharpTest.Net.HttpClone.Commands
                     });
         }
 
-        public void Edit(string url)
+        [Command(Category = "Viewing", Description = "Edit the content url with the default registered program.")]
+        public void Edit(
+            [Argument("page", "p", Description = "The http address of the web page.")]
+            string url)
         {
             OpenWith(null, "edit", true, true, url);
         }
 
-        public void Notepad(string url)
+        [Command(Category = "Viewing", Description = "Open the content url with notepad.exe.")]
+        public void Notepad(
+            [Argument("page", "p", Description = "The http address of the web page.")]
+            string url)
         {
             OpenWith("notepad.exe", null, true, true, url);
         }
 
-        public void Open(string url)
+        [Command(Category = "Viewing", Description = "Open the content url with the default registered program.")]
+        public void Open(
+            [Argument("page", "p", Description = "The http address of the web page.")]
+            string url)
         {
             OpenWith(null, "open", false, false, url);
         }

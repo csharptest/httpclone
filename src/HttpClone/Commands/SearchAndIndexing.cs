@@ -14,7 +14,6 @@
 #endregion
 
 using System;
-using System.ComponentModel;
 using CSharpTest.Net.Commands;
 using CSharpTest.Net.HttpClone.Common;
 using CSharpTest.Net.HttpClone.Publishing;
@@ -24,7 +23,10 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void Index(string site)
+        [Command(Category = "Searching", Description = "Creates a clean copy of the search index for the site.")]
+        public void Index(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site)
         {
             using (ContentIndexing indexer = new ContentIndexing(StoragePath(site), site))
             {
@@ -32,7 +34,10 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void MakeSearchTemplate(string site)
+        [Command("NewTemplate", "MakeSearchTemplate", Category = "Searching", Description = "Recreates the search template from the original content.")]
+        public void MakeSearchTemplate(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site)
         {
             using(ContentStorage store = new ContentStorage(StoragePath(site), false))
             {
@@ -41,7 +46,10 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void Like(string url)
+        [Command(Category = "Searching", Description = "Displays content similar to the page provided.")]
+        public void Like(
+            [Argument("page", "p", Description = "The http address of the web page.")]
+            string url)
         {
             using (ContentStorage store = new ContentStorage(StoragePath(url), true))
             {
@@ -53,7 +61,14 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void Search(string site, string term, [DefaultValue(false)] bool newest)
+        [Command(Category = "Searching", Description = "Searches the site and prints the matching pages.")]
+        public void Search(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("term", "t", Description = "The expression to search for, see http://lucene.apache.org/java/2_4_0/queryparsersyntax.html.")]
+            string term,
+            [Argument("newest", "n", DefaultValue = false, Description = "Order the results by date rather than by best match.")]
+            bool newest)
         {
             int limit = 50;
             using (ContentStorage store = new ContentStorage(StoragePath(site), true))
@@ -71,13 +86,20 @@ namespace CSharpTest.Net.HttpClone.Commands
                     Console.WriteLine("[{0} of {1} total]", count, total);
             }
         }
-        
-        public void HtmlSearch(string site, string term)
+
+        [Command(Category = "Searching", Description = "Searches the site and prints the rendered html result.")]
+        public void HtmlSearch(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("term", "t", Description = "The expression to search for, see http://lucene.apache.org/java/2_4_0/queryparsersyntax.html.")]
+            string term,
+            [Argument("page", "p", DefaultValue = 1, Description = "The result page to return.")]
+            int page)
         {
             using (ContentStorage store = new ContentStorage(StoragePath(site), true))
             {
                 SearchTemplate template = new SearchTemplate(store);
-                string tmp = template.RenderResults(term, 1);
+                string tmp = template.RenderResults(term, page);
                 Console.WriteLine(tmp);
             }
         }

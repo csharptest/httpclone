@@ -204,7 +204,6 @@ namespace CSharpTest.Net.HttpClone.Publishing
             }
         }
 
-
         class XmlRewriter
         {
             private readonly ContentParser _processor;

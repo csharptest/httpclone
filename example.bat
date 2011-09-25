@@ -11,16 +11,17 @@
 REM 	Let's start by removing the existing site if one exists
 src\bin\httpclone.exe deletesite http://localhost:11080 /noprompt
 
-REM 	The first thing to do here is go to collect our sample website, w3example.wordpress.com, and save
-REM 	it (renaming all links) into our test site, localhost:11080
-src\bin\httpclone.exe update http://localhost:11080 http://w3example.wordpress.com
+REM 	The first thing to do here is go to collect our sample website, w3example.wordpress.com,
+src\bin\httpclone.exe crawlsite http://w3example.wordpress.com
+REM 	... and save it (renaming all links) into our test site, localhost:11080
+src\bin\httpclone.exe copysite http://w3example.wordpress.com http://localhost:11080
 
 REM 	Now that we've imported the w3example.wordpress.com domain, we want to add some files from other
 REM 	locations.  The first thing we want to collect is the style-sheets that are on s0.wp.com, we will
-REM 	addrecursive here so that all images, stylesheets, etc that they point to are also imported. While
+REM 	import here so that all images, stylesheets, etc that they point to are also imported. While
 REM 	we are importing, we will rebase them at the root of the site '/global.css' and '/style.css'.
-src\bin\httpclone.exe addrecursive http://localhost:11080/global.css http://s0.wp.com/wp-content/themes/h4/global.css
-src\bin\httpclone.exe addrecursive http://localhost:11080/style.css http://s0.wp.com/wp-content/themes/pub/titan/style.css
+src\bin\httpclone.exe import /recursive http://localhost:11080/global.css http://s0.wp.com/wp-content/themes/h4/global.css
+src\bin\httpclone.exe import /recursive http://localhost:11080/style.css http://s0.wp.com/wp-content/themes/pub/titan/style.css
 
 REM 	After importing these styles, we want to map all style references to use these locations instead
 REM 	of their original addresses.
@@ -34,7 +35,7 @@ src\bin\httpclone.exe optimize http://localhost:11080
 REM 	Another thing the crawler can have trouble with is recognizing duplicate content.  It's always best
 REM 	to remove that duplication entirely, or at least insert redirects.  The following finds duplicates
 REM 	and redirects them:
-src\bin\httpclone.exe dedupcontent http://localhost:11080 /noprompt
+src\bin\httpclone.exe deduplicate http://localhost:11080 /noprompt
 
 REM 	Now we can run index to produced the search index, the search.css stylesheet, and the template
 src\bin\httpclone.exe index http://localhost:11080

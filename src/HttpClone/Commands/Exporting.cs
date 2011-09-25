@@ -15,7 +15,6 @@
 
 using System;
 using System.IO;
-using System.ComponentModel;
 using CSharpTest.Net.Commands;
 using CSharpTest.Net.HttpClone.Publishing;
 
@@ -40,8 +39,8 @@ namespace CSharpTest.Net.HttpClone.Commands
             string site,
             [Argument("path", "p", Description = "The directory to export to.")]
             string directory,
-            [Argument("rebase", Description = "Changes the fully-qualified links to use file: references.")]
-            [DefaultValue(true)] bool rebase)
+            [Argument("rebase", DefaultValue = true, Description = "Changes the fully-qualified links to use file: references.")]
+            bool rebase)
         {
             if (String.IsNullOrEmpty(directory) || File.Exists(directory))
                 throw new ArgumentException("Please specify a valid directory.");

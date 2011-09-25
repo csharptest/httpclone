@@ -21,8 +21,16 @@ namespace CSharpTest.Net.HttpClone
     {
         static readonly System.Collections.Specialized.NameValueCollection AppSettings = System.Configuration.ConfigurationManager.AppSettings;
 
-        public static string StorePath { get { return Environment.ExpandEnvironmentVariables(AppSettings["StorePath"] ?? "Store"); } }
-        public static string LogPath { get { return Environment.ExpandEnvironmentVariables(AppSettings["LogPath"] ?? "Log"); } }
+        public static string StorePath
+        { 
+            get { return Environment.ExpandEnvironmentVariables(AppSettings["StorePath"] ?? "Store"); }
+            set { AppSettings["StorePath"] = value; }
+        }
+        public static string LogPath 
+        { 
+            get { return Environment.ExpandEnvironmentVariables(AppSettings["LogPath"] ?? "Log"); }
+            set { AppSettings["LogPath"] = value; }
+        }
 
         public static LogLevels LogLevel
         {
@@ -32,6 +40,7 @@ namespace CSharpTest.Net.HttpClone
                     ? (LogLevels)Enum.Parse(typeof(LogLevels), AppSettings["LogLevel"])
                     : LogLevels.Verbose;
             }
+            set { AppSettings["LogLevel"] = value.ToString(); }
         }
 
         public static string RegistryPath { get { return AppSettings["RegistryPath"] ?? @"SOFTWARE\CSharpTest.Net\HttpClone"; } }

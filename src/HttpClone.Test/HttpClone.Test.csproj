@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ED9411B0-0696-4B02-A353-E9F74A80E697}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyName>CSharpTest.Net.HttpClone.Test</AssemblyName>
+    <DelaySign>false</DelaySign>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\keyfile\httpclone.snk</AssemblyOriginatorKeyFile>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CSharpTest.Net.HttpClone.Test</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\bin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\bin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CSharpTest.Net.BPlusTree, PublicKeyToken=06aee00cce822474">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\CSharpTest.Net.BPlusTree.dll</HintPath>
+    </Reference>
+    <Reference Include="CSharpTest.Net.Library, PublicKeyToken=06aee00cce822474">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\CSharpTest.Net.Library.dll</HintPath>
+    </Reference>
+    <Reference Include="CSharpTest.Net.Logging, PublicKeyToken=06aee00cce822474">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\CSharpTest.Net.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers, PublicKeyToken=17b3b1f090c3ea48">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, PublicKeyToken=96d09a1eb7f44a77">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Depends\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HttpClone.Hosting\HttpClone.Hosting.csproj">
+      <Project>{AD9411B0-0696-4B02-A353-E9F74A80E697}</Project>
+      <Name>HttpClone.Hosting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HttpClone.Library\HttpClone.Library.csproj">
+      <Project>{BD9411B0-0696-4B02-A353-E9F74A80E697}</Project>
+      <Name>HttpClone.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HttpClone\HttpClone.csproj">
+      <Project>{0D9411B0-0696-4B02-A353-E9F74A80E697}</Project>
+      <Name>HttpClone</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TestCommands.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <EmbeddedResource Include="w3example.zip" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

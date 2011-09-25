@@ -1,0 +1,889 @@
+<html>
+  <head>
+    <title>HttpClone.exe Help</title>
+    <style>
+* { font-family: Tahoma, Arial, Times New Roman; font-size: 10pt; }
+pre { font-family: Courier New; font-size: 10pt; padding: 8px; border: solid 1px gray; }
+h1 { font-size: 16pt; color: Navy; background: #f0f0f0; padding: 4px; border: outset 1px white; }
+h2 { font-size: 14pt; color: Navy; background: #f0f0f0; padding: 4px; border: outset 1px white; }
+h3 { font-size: 12pt; color: Navy; background: #f0f0f0; padding: 4px; border: outset 1px white; }
+blockquote { margin-right: 0px; }
+li { padding: 2px; }
+a { color: Navy; }
+    </style>
+  </head>
+  <body>
+    <h1>Usage:</h1>
+    <p>
+      <pre>C:\&gt; HttpClone.exe COMMAND [arguments]</pre>
+    </p>
+    <p>A simple website clone, export, and/or publishing utility.</p>
+    <h1>All Commands:</h1>
+    <blockquote>
+      <ul>
+        <li>
+          <a href="#Content">Content</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Deduplicate">Deduplicate</a> - Search the site for duplicate content and redirect or remove the duplicates.</li>
+          <li>
+            <a href="#Import">Import</a> - Imports a url to a specified page.</li>
+          <li>
+            <a href="#Internalize">Internalize</a> - Imports a url, and then modified all links to source to point to the target page.</li>
+          <li>
+            <a href="#Remove">Remove</a> - Removes a single page from the site.</li>
+          <li>
+            <a href="#Rename">Rename</a> - Rename a content url from one location to another.</li>
+        </ul>
+        <li>
+          <a href="#Exporting">Exporting</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Archive">Archive</a> - Creates a zip file that can be transfered manually to a server or used as a backup.</li>
+          <li>
+            <a href="#Export">Export</a> - Exports the website copy as html to a local directory.</li>
+        </ul>
+        <li>
+          <a href="#Hyperlinks">Hyperlinks</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Links">Links</a> - Lists all the known links for the specified site.</li>
+          <li>
+            <a href="#LinkSource">LinkSource</a> - Tracks down all pages that reference a specified link.</li>
+          <li>
+            <a href="#List">List</a> - Lists all the known pages for the specified site.</li>
+          <li>
+            <a href="#Relink">Relink</a> - Changes all links from one url to another.</li>
+          <li>
+            <a href="#RelinkEx">RelinkEx</a> - Changes all links matching an expression to the evaluated target link.</li>
+        </ul>
+        <li>
+          <a href="#Optimizations">Optimizations</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Optimize">Optimize</a> - Apply the optimization rules associated with each document type configured.</li>
+          <li>
+            <a href="#OptimizePage">OptimizePage</a> - Apply the optimization rules to a single page.</li>
+        </ul>
+        <li>
+          <a href="#Pingbacks">Pingbacks</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Pingback">Pingback</a> - Sends a pingback notice to a website.</li>
+          <li>
+            <a href="#PingReplay">PingReplay</a> - Reads the pingbacks recorded on a live site and replays them.</li>
+        </ul>
+        <li>
+          <a href="#Publishing">Publishing</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Host">Host</a> - Runs a small HTTP host to server the content of the site on the port provided.</li>
+          <li>
+            <a href="#Publish">Publish</a> - Publishes the a new snapshot of the website.</li>
+          <li>
+            <a href="#PublishTo">PublishTo</a> - Publishes the a new snapshot of the website to the specified host.</li>
+        </ul>
+        <li>
+          <a href="#Searching">Searching</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#HtmlSearch">HtmlSearch</a> - Searches the site and prints the rendered html result.</li>
+          <li>
+            <a href="#Index">Index</a> - Creates a clean copy of the search index for the site.</li>
+          <li>
+            <a href="#Like">Like</a> - Displays content similar to the page provided.</li>
+          <li>
+            <a href="#NewTemplate">NewTemplate</a> - Recreates the search template from the original content.</li>
+          <li>
+            <a href="#Search">Search</a> - Searches the site and prints the matching pages.</li>
+        </ul>
+        <li>
+          <a href="#Security">Security</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#cPassword">cPassword</a> - Specifies the password used to access the client RSA publishing key.</li>
+          <li>
+            <a href="#CreateKeys">CreateKeys</a> - Creates the client/server shared keys used for remote publishing.</li>
+          <li>
+            <a href="#sPassword">sPassword</a> - Transmits the server password used to access the RSA publishing key.</li>
+        </ul>
+        <li>
+          <a href="#Viewing">Viewing</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#Dump">Dump</a> - Print the details about the content to the console.</li>
+          <li>
+            <a href="#Edit">Edit</a> - Edit the content url with the default registered program.</li>
+          <li>
+            <a href="#Notepad">Notepad</a> - Open the content url with notepad.exe.</li>
+          <li>
+            <a href="#Open">Open</a> - Open the content url with the default registered program.</li>
+          <li>
+            <a href="#Type">Type</a> - Print the content url to the console.</li>
+        </ul>
+        <li>
+          <a href="#Websites">Websites</a>
+        </li>
+        <ul>
+          <li>
+            <a href="#CopySite">CopySite</a> - Copy one website to another changing all links to the original to the target.</li>
+          <li>
+            <a href="#CrawlSite">CrawlSite</a> - Crawl the website provided and store any changed content.</li>
+          <li>
+            <a href="#DeleteSite">DeleteSite</a> - Delete the specified website copy.</li>
+          <li>
+            <a href="#UpdateSite">UpdateSite</a> - Crawl, Optimize, Deduplicate, and Index the website provided.</li>
+        </ul>
+      </ul>
+    </blockquote>
+    <h2>
+      <a name="Content">
+      </a>Content Commands:</h2>
+    <blockquote>
+      <a name="Deduplicate">
+      </a>
+      <h3>Deduplicate</h3>
+      <blockquote>
+        <p>Search the site for duplicate content and redirect or remove the duplicates.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe DEDUPLICATE [/site=]String [/remove] [/noprompt] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/remove]</strong> = (False) - True to remove the page and modify source links, otherwise inserts a redirect.</li>
+          <li>
+            <strong>[/noprompt]</strong> = (False) - True to stop prompt for confirmation before changing content.</li>
+        </ul>
+      </blockquote>
+      <a name="Import">
+      </a>
+      <h3>Import</h3>
+      <blockquote>
+        <p>Imports a url to a specified page.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe IMPORT [/page=]String [/source=]String [/recursive] [/noprompt] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The full http address of the page to save the source content to.</li>
+          <li>
+            <strong>[/source=]String</strong> - The full http address of the page you want to import.</li>
+          <li>
+            <strong>[/recursive]</strong> = (False) - True to recursivly import all links within the same domain.</li>
+          <li>
+            <strong>[/noprompt]</strong> = (False) - True to stop prompt for confirmation before overwriting content.</li>
+        </ul>
+      </blockquote>
+      <a name="Internalize">
+      </a>
+      <h3>Internalize</h3>
+      <blockquote>
+        <p>Imports a url, and then modified all links to source to point to the target page.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe INTERNALIZE [/page=]String [/source=]String [/recursive] [/noprompt] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The full http address of the page to save the source content to.</li>
+          <li>
+            <strong>[/source=]String</strong> - The full http address of the page you want to import.</li>
+          <li>
+            <strong>[/recursive]</strong> = (False) - True to recursivly import all links within the same domain.</li>
+          <li>
+            <strong>[/noprompt]</strong> = (False) - True to stop prompt for confirmation before overwriting content.</li>
+        </ul>
+      </blockquote>
+      <a name="Remove">
+      </a>
+      <h3>Remove</h3>
+      <blockquote>
+        <p>Removes a single page from the site.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe REMOVE [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The full http address of the page you want to remove.</li>
+        </ul>
+      </blockquote>
+      <a name="Rename">
+      </a>
+      <h3>Rename</h3>
+      <blockquote>
+        <p>Rename a content url from one location to another.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe RENAME [/page=]String [/source=]String [/redirect] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The full http address of the page to move the source content to.</li>
+          <li>
+            <strong>[/source=]String</strong> - The full http address of the page you want to move.</li>
+          <li>
+            <strong>[/redirect]</strong> = (True) - True to insert a redirect after moving the content.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Exporting">
+      </a>Exporting Commands:</h2>
+    <blockquote>
+      <a name="Archive">
+      </a>
+      <h3>Archive</h3>
+      <blockquote>
+        <p>Creates a zip file that can be transfered manually to a server or used as a backup.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe ARCHIVE [/site=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+        </ul>
+      </blockquote>
+      <a name="Export">
+      </a>
+      <h3>Export</h3>
+      <blockquote>
+        <p>Exports the website copy as html to a local directory.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe EXPORT [/site=]String [/path=]String [/rebase] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/path=]String</strong> - The directory to export to.</li>
+          <li>
+            <strong>[/rebase]</strong> = (True) - Changes the fully-qualified links to use file: references.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Hyperlinks">
+      </a>Hyperlinks Commands:</h2>
+    <blockquote>
+      <a name="Links">
+      </a>
+      <h3>Links</h3>
+      <blockquote>
+        <p>Lists all the known links for the specified site.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe LINKS [/site=]String [/verbose] [/validate] [/internal] [/external] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/verbose]</strong> = (True) - Display detailed information about each link.</li>
+          <li>
+            <strong>[/validate]</strong> = (False) - Check each link and print the status information.</li>
+          <li>
+            <strong>[/internal]</strong> = (True) - Set to false or 0 to omit internal links.</li>
+          <li>
+            <strong>[/external]</strong> = (True) - Set to false or 0 to omit external links.</li>
+        </ul>
+      </blockquote>
+      <a name="LinkSource">
+      </a>
+      <h3>LinkSource</h3>
+      <blockquote>
+        <p>Tracks down all pages that reference a specified link.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe LINKSOURCE [/site=]String [/link=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/link=]String</strong> - The target link to search for.</li>
+        </ul>
+      </blockquote>
+      <a name="List">
+      </a>
+      <h3>List</h3>
+      <blockquote>
+        <p>Lists all the known pages for the specified site.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe LIST [/site=]String [/verbose] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/verbose]</strong> = (False) - Display detailed information about each page or link.</li>
+        </ul>
+      </blockquote>
+      <a name="Relink">
+      </a>
+      <h3>Relink</h3>
+      <blockquote>
+        <p>Changes all links from one url to another.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe RELINK [/site=]String [/from=]String [/target=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/from=]String</strong> - The original link you want to change.</li>
+          <li>
+            <strong>[/target=]String</strong> - The new link you want to use instead.</li>
+        </ul>
+      </blockquote>
+      <a name="RelinkEx">
+      </a>
+      <h3>RelinkEx</h3>
+      <blockquote>
+        <p>Changes all links matching an expression to the evaluated target link.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe RELINKEX [/site=]String [/expression=]String [/target=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/expression=]String</strong> - A regular expression to match against the links.</li>
+          <li>
+            <strong>[/target=]String</strong> - The new link, use {0} to insert matched capture groups by ordinal.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Optimizations">
+      </a>Optimizations Commands:</h2>
+    <blockquote>
+      <a name="Optimize">
+      </a>
+      <h3>Optimize</h3>
+      <blockquote>
+        <p>Apply the optimization rules associated with each document type configured.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe OPTIMIZE [/site=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+        </ul>
+      </blockquote>
+      <a name="OptimizePage">
+      </a>
+      <h3>OptimizePage</h3>
+      <blockquote>
+        <p>Apply the optimization rules to a single page.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe OPTIMIZEPAGE [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The full http address of the page you want to run optimizations on.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Pingbacks">
+      </a>Pingbacks Commands:</h2>
+    <blockquote>
+      <a name="Pingback">
+      </a>
+      <h3>Pingback</h3>
+      <blockquote>
+        <p>Sends a pingback notice to a website.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe PINGBACK [/source=]String [/target=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/source=]String</strong> - The http address of the web page linking to target.</li>
+          <li>
+            <strong>[/target=]String</strong> - The http address of the target paged linked from source.</li>
+        </ul>
+      </blockquote>
+      <a name="PingReplay">
+      </a>
+      <h3>PingReplay</h3>
+      <blockquote>
+        <p>Reads the pingbacks recorded on a live site and replays them.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe PINGREPLAY [/site=]String [/source=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website to replay on.</li>
+          <li>
+            <strong>[/source=]String</strong> - The http address of the live website to read pingbacks from.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Publishing">
+      </a>Publishing Commands:</h2>
+    <blockquote>
+      <a name="Host">
+      </a>
+      <h3>Host</h3>
+      <blockquote>
+        <p>Runs a small HTTP host to server the content of the site on the port provided.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe HOST [/site=]String [[/port=]Int32] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[[/port=]Int32]</strong> = (11080) - The tcp/ip port to use for hosting the content.</li>
+        </ul>
+      </blockquote>
+      <a name="Publish">
+      </a>
+      <h3>Publish</h3>
+      <blockquote>
+        <p>Publishes the a new snapshot of the website.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe PUBLISH [/site=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+        </ul>
+      </blockquote>
+      <a name="PublishTo">
+      </a>
+      <h3>PublishTo</h3>
+      <blockquote>
+        <p>Publishes the a new snapshot of the website to the specified host.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe PUBLISHTO [/site=]String [/host=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/host=]String</strong> - The root http address of the target website host.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Searching">
+      </a>Searching Commands:</h2>
+    <blockquote>
+      <a name="HtmlSearch">
+      </a>
+      <h3>HtmlSearch</h3>
+      <blockquote>
+        <p>Searches the site and prints the rendered html result.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe HTMLSEARCH [/site=]String [/term=]String [[/page=]Int32] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/term=]String</strong> - The expression to search for, see http://lucene.apache.org/java/2_4_0/queryparsersyntax.html.</li>
+          <li>
+            <strong>[[/page=]Int32]</strong> = (1) - The result page to return.</li>
+        </ul>
+      </blockquote>
+      <a name="Index">
+      </a>
+      <h3>Index</h3>
+      <blockquote>
+        <p>Creates a clean copy of the search index for the site.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe INDEX [/site=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+        </ul>
+      </blockquote>
+      <a name="Like">
+      </a>
+      <h3>Like</h3>
+      <blockquote>
+        <p>Displays content similar to the page provided.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe LIKE [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The http address of the web page.</li>
+        </ul>
+      </blockquote>
+      <a name="NewTemplate">
+      </a>
+      <h3>NewTemplate</h3>
+      <blockquote>
+        <p>Recreates the search template from the original content.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe NEWTEMPLATE [/site=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+        </ul>
+      </blockquote>
+      <a name="Search">
+      </a>
+      <h3>Search</h3>
+      <blockquote>
+        <p>Searches the site and prints the matching pages.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe SEARCH [/site=]String [/term=]String [/newest] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/term=]String</strong> - The expression to search for, see http://lucene.apache.org/java/2_4_0/queryparsersyntax.html.</li>
+          <li>
+            <strong>[/newest]</strong> = (False) - Order the results by date rather than by best match.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Security">
+      </a>Security Commands:</h2>
+    <blockquote>
+      <a name="cPassword">
+      </a>
+      <h3>cPassword</h3>
+      <blockquote>
+        <p>Specifies the password used to access the client RSA publishing key.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe CPASSWORD [/site=]String [/password=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/password=]String</strong> - The password to be used.</li>
+        </ul>
+      </blockquote>
+      <a name="CreateKeys">
+      </a>
+      <h3>CreateKeys</h3>
+      <blockquote>
+        <p>Creates the client/server shared keys used for remote publishing.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe CREATEKEYS [/site=]String [[/key-size=]Int32] [[/password=]String] [/NoServerPassword] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[[/key-size=]Int32]</strong> = (4096) - The size, in bits, of the RSA cryptographic keys to produce.</li>
+          <li>
+            <strong>[[/password=]String]</strong> - The client password used for access to the RSA publishing key (Empty for prompt).</li>
+          <li>
+            <strong>[/NoServerPassword]</strong> = (False) - Do not generate or require a password for the server's RSA publishing key.</li>
+        </ul>
+      </blockquote>
+      <a name="sPassword">
+      </a>
+      <h3>sPassword</h3>
+      <blockquote>
+        <p>Transmits the server password used to access the RSA publishing key.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe SPASSWORD [/site=]String [/password=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/password=]String</strong> - The password to be used (obtained from CreateKeys).</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Viewing">
+      </a>Viewing Commands:</h2>
+    <blockquote>
+      <a name="Dump">
+      </a>
+      <h3>Dump</h3>
+      <blockquote>
+        <p>Print the details about the content to the console.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe DUMP [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The http address of the web page.</li>
+        </ul>
+      </blockquote>
+      <a name="Edit">
+      </a>
+      <h3>Edit</h3>
+      <blockquote>
+        <p>Edit the content url with the default registered program.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe EDIT [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The http address of the web page.</li>
+        </ul>
+      </blockquote>
+      <a name="Notepad">
+      </a>
+      <h3>Notepad</h3>
+      <blockquote>
+        <p>Open the content url with notepad.exe.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe NOTEPAD [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The http address of the web page.</li>
+        </ul>
+      </blockquote>
+      <a name="Open">
+      </a>
+      <h3>Open</h3>
+      <blockquote>
+        <p>Open the content url with the default registered program.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe OPEN [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The http address of the web page.</li>
+        </ul>
+      </blockquote>
+      <a name="Type">
+      </a>
+      <h3>Type</h3>
+      <blockquote>
+        <p>Print the content url to the console.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe TYPE [/page=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/page=]String</strong> - The http address of the web page.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+    <h2>
+      <a name="Websites">
+      </a>Websites Commands:</h2>
+    <blockquote>
+      <a name="CopySite">
+      </a>
+      <h3>CopySite</h3>
+      <blockquote>
+        <p>Copy one website to another changing all links to the original to the target.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe COPYSITE [/site=]String [/target=]String [/overwrite] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website to copy.</li>
+          <li>
+            <strong>[/target=]String</strong> - The root http address of the destination website.</li>
+          <li>
+            <strong>[/overwrite]</strong> = (False) - True to overwrite any existing content.</li>
+        </ul>
+      </blockquote>
+      <a name="CrawlSite">
+      </a>
+      <h3>CrawlSite</h3>
+      <blockquote>
+        <p>Crawl the website provided and store any changed content.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe CRAWLSITE [/site=]String </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+        </ul>
+      </blockquote>
+      <a name="DeleteSite">
+      </a>
+      <h3>DeleteSite</h3>
+      <blockquote>
+        <p>Delete the specified website copy.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe DELETESITE [/site=]String [/noprompt] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[/noprompt]</strong> = (False) - True to suppress confirmation message.</li>
+        </ul>
+      </blockquote>
+      <a name="UpdateSite">
+      </a>
+      <h3>UpdateSite</h3>
+      <blockquote>
+        <p>Crawl, Optimize, Deduplicate, and Index the website provided.</p>
+        <strong>Usage:</strong>
+        <p>
+          <pre>C:\&gt; HttpClone.exe UPDATESITE [/site=]String [[/source=]String] </pre>
+        </p>
+        <p>
+          <strong>Arguments:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>[/site=]String</strong> - The root http address of the website copy.</li>
+          <li>
+            <strong>[[/source=]String]</strong> - Overrides the source http address.</li>
+        </ul>
+      </blockquote>
+    </blockquote>
+  </body>
+</html>

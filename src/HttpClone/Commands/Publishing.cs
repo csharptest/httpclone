@@ -16,7 +16,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using System.ComponentModel;
+using CSharpTest.Net.Commands;
 using CSharpTest.Net.Threading;
 using CSharpTest.Net.HttpClone.Common;
 using CSharpTest.Net.HttpClone.Publishing;
@@ -27,30 +27,10 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        private void GetClientPassword(SitePublisher pub)
-        {
-            if (!pub.HasClientPassword)
-            {
-                using (new ConsoleEchoOff())
-                {
-                    for (int i = 2; i >= 0; i--)
-                    {
-                        try
-                        {
-                            Console.Write("Enter client password: ");
-                            pub.SetClientPassword(Console.ReadLine());
-                            break;
-                        }
-                        catch
-                        { if (i == 0) throw; }
-                        finally
-                        { Console.WriteLine(); }
-                    }
-                }
-            }
-        }
-
-        public void Publish(string site)
+        [Command(Category = "Publishing", Description = "Publishes the a new snapshot of the website.")]
+        public void Publish(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site)
         {
             using (SitePublisher index = new SitePublisher(StoragePath(site), site))
             {
@@ -59,7 +39,12 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void PublishTo(string siteToPublish, string destinationUrl)
+        [Command(Category = "Publishing", Description = "Publishes the a new snapshot of the website to the specified host.")]
+        public void PublishTo(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string siteToPublish,
+            [Argument("host", "h", Description = "The root http address of the target website host.")]
+            string destinationUrl)
         {
             using (SitePublisher index = new SitePublisher(StoragePath(siteToPublish), siteToPublish))
             {
@@ -68,18 +53,41 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void Host(string url, [DefaultValue(11080)] int port)
+        [Command(Category = "Publishing", Description = "Runs a small HTTP host to server the content of the site on the port provided.")]
+        public void Host(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string url,
+            [Argument("port", "p", DefaultValue = 11080, Description = "The tcp/ip port to use for hosting the content.")]
+            int port)
         {
+            Uri siteUri = new Uri(url, UriKind.Absolute);
             using (ContentStorage store = new ContentStorage(StoragePath(url), true))
             using (WcfHttpHost host = new WcfHttpHost(store, port))
             {
-                Process.Start(host.Uri.AbsoluteUri);
+                Process.Start(new Uri(host.Uri, siteUri.PathAndQuery).AbsoluteUri);
                 Console.Write("Press [Enter] to exit.");
                 Console.ReadLine();
             }
         }
 
-        public void Perf(string url, [DefaultValue(60)] int duration, [DefaultValue(1)] int repeated, [DefaultValue(0)] int threads, [DefaultValue(false)] bool stopOnError)
+        private void GetClientPassword(SitePublisher publisher)
+        {
+            if(!publisher.HasClientPassword)
+                GetPassword("Enter client password: ", publisher.SetClientPassword);
+        }
+
+        [Command(Category = "Publishing", Visible = false, Description = "Runs a repeated get request for the provided url and times the results.")]
+        public void Benchmark(
+            [Argument("page", "p", Description = "The http address of the web page to fetch.")]
+            string url, 
+            [Argument(DefaultValue = 60, Description = "The duration of a single run of the test")] 
+            int duration,
+            [Argument(DefaultValue = 1, Description = "The number of times to repeat the duration of the test")] 
+            int repeated,
+            [Argument(DefaultValue = 0, Description = "The number of threads to run")] 
+            int threads,
+            [Argument(DefaultValue = false, Description = "Cancel the test on the first http error.")] 
+            bool stopOnError)
         {
             Uri uri = new Uri(url, UriKind.Absolute);
             Uri baseUri = new Uri(uri, "/");

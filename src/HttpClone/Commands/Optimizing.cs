@@ -14,7 +14,6 @@
 #endregion
 
 using System;
-using System.ComponentModel;
 using CSharpTest.Net.Commands;
 using CSharpTest.Net.HttpClone.Publishing;
 
@@ -22,21 +21,31 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void Optimize(string site, [DefaultValue(false)] bool condense)
+        [Command(Category = "Optimizations", Description = "Apply the optimization rules associated with each document type configured.")]
+        public void Optimize(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("condense", Visible = false, DefaultValue = false, Description = "TODO: Rewrite the html collapsing whitespace.")]
+            bool condense)
         {
             using (ContentOptimizier optimizier = new ContentOptimizier(StoragePath(site), site))
             {
-                optimizier.CondenseHtml = condense;
+                //BROKEN: optimizier.CondenseHtml = condense;
                 optimizier.OptimizeAll();
             }
         }
 
-        public void OptimizePage(string site, [DefaultValue(false)] bool condense)
+        [Command(Category = "Optimizations", Description = "Apply the optimization rules to a single page.")]
+        public void OptimizePage(
+            [Argument("page", "p", Description = "The full http address of the page you want to run optimizations on.")]
+            string site,
+            [Argument("condense", Visible = false, DefaultValue = false, Description = "TODO: Rewrite the html collapsing whitespace.")]
+            bool condense)
         {
             Uri path = new Uri(site, UriKind.Absolute);
             using (ContentOptimizier optimizier = new ContentOptimizier(StoragePath(site), site))
             {
-                optimizier.CondenseHtml = condense;
+                //BROKEN: optimizier.CondenseHtml = condense;
                 optimizier.OptimizePage(path.NormalizedPathAndQuery());
             }
         }

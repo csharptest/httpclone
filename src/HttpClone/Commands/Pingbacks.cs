@@ -22,7 +22,12 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void PingbackReplay(string site, string pullFrom)
+        [Command(Category = "Pingbacks", Description = "Reads the pingbacks recorded on a live site and replays them.")]
+        public void PingReplay(
+            [Argument("site", "s", Description = "The root http address of the website to replay on.")]
+            string site,
+            [Argument("source", Description = "The http address of the live website to read pingbacks from.")]
+            string pullFrom)
         {
             PingbackClient client = new PingbackClient(site);
             client.LogError += Console.Error.WriteLine;
@@ -33,7 +38,12 @@ namespace CSharpTest.Net.HttpClone.Commands
                 Path.Combine(StoragePath(site), "playback.bin"));
         }
 
-        public void Pingback(string source, string target)
+        [Command(Category = "Pingbacks", Description = "Sends a pingback notice to a website.")]
+        public void Pingback(
+            [Argument("source", "s", Description = "The http address of the web page linking to target.")]
+            string source,
+            [Argument("target", "t", Description = "The http address of the target paged linked from source.")]
+            string target)
         {
             PingbackClient client = new PingbackClient(target);
             client.LogError += Console.Error.WriteLine;

@@ -51,6 +51,7 @@ namespace CSharpTest.Net.HttpClone.Publishing
             _parser = new ContentParser(_data, _baseUri);
             _parser.VisitUri += AddUri;
 
+            AddUrlsFound = true;
             UpdateSearchTemplate = true;
             MaxCrawlAge = TimeSpan.MaxValue;
             AddUri(new Uri(uriStart, UriKind.Absolute));
@@ -68,6 +69,7 @@ namespace CSharpTest.Net.HttpClone.Publishing
         public Uri BaseUri { get { return _baseUri; } }
         public bool UpdateSearchTemplate { get; set; }
         public bool NoDefaultPages { get; set; }
+        public bool AddUrlsFound { get; set; }
 
         public bool CrawlSite()
         {
@@ -124,6 +126,11 @@ namespace CSharpTest.Net.HttpClone.Publishing
             }
 
             return Modified;
+        }
+
+        public void CrawlPage(string sourceLink)
+        {
+            new FetchUrl(this, sourceLink, String.Empty, a => a()).DoWork();
         }
 
         public void AddUrls(Uri relative, IEnumerable<string> links)
@@ -290,7 +297,8 @@ namespace CSharpTest.Net.HttpClone.Publishing
 
         private void ProcessFileContent(ContentRecord record, byte[] contentBytes)
         {
-            _parser.ProcessFile(record, contentBytes);
+            if(AddUrlsFound)
+                _parser.ProcessFile(record, contentBytes);
         }
     }
 }

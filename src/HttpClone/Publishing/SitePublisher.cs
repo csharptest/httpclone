@@ -34,6 +34,7 @@ namespace CSharpTest.Net.HttpClone.Publishing
         private readonly Uri _siteUri;
         private readonly RSAKeyPair _rsaKeyPair;
         private readonly string _publishUri;
+        private readonly string _keyfile;
 
         public SitePublisher(string storagePath, string site)
         {
@@ -41,20 +42,21 @@ namespace CSharpTest.Net.HttpClone.Publishing
             _siteUri = new Uri(site, UriKind.Absolute);
             _content = new ContentStorage(storagePath, true);
 
-            string keyfile = Path.Combine(storagePath, "client-publishing.key");
-            if(!File.Exists(keyfile))
-                throw new FileNotFoundException("You must have a client publication key, see the command 'createkeys'", keyfile);
-            _rsaKeyPair = new RSAKeyPair(keyfile, true);
-
-            // we publish on the hash of both client and server keys so that if the handler is invoked there is already
-            // a high-probability that the keyset will match.
-            _publishUri = "/api/publish/" + Safe64Encoding.EncodeBytes(_rsaKeyPair.KeyPairHash.ToArray()) + "/";
+            _keyfile = Path.Combine(storagePath, "client-publishing.key");
+            if (File.Exists(_keyfile))
+            {
+                _rsaKeyPair = new RSAKeyPair(_keyfile, true);
+                // we publish on the hash of both client and server keys so that if the handler is invoked there is already
+                // a high-probability that the keyset will match.
+                _publishUri = "/api/publish/" + Safe64Encoding.EncodeBytes(_rsaKeyPair.KeyPairHash.ToArray()) + "/";
+            }
         }
 
         public void Dispose()
         {
             _content.Dispose();
-            _rsaKeyPair.Dispose();
+            if(_rsaKeyPair != null)
+                _rsaKeyPair.Dispose();
         }
 
         public bool HasClientPassword { get { try { GC.KeepAlive(_rsaKeyPair.ClientPrivateKey); return true; } catch { return false; } } }
@@ -101,6 +103,9 @@ namespace CSharpTest.Net.HttpClone.Publishing
 
         public void Publish(Uri destination)
         {
+            if(_rsaKeyPair == null)
+                throw new FileNotFoundException("You must have a client publication key, see the command 'createkeys'", _keyfile);
+
             Console.WriteLine("Creating site archive...");
             string file = CreateArchiveFile();
             Console.WriteLine("Connecting to server...");
@@ -138,6 +143,9 @@ namespace CSharpTest.Net.HttpClone.Publishing
 
         public void SetClientPassword(string password)
         {
+            if (_rsaKeyPair == null)
+                throw new FileNotFoundException("You must have a client publication key, see the command 'createkeys'", _keyfile);
+
             _rsaKeyPair.SetClientPassword(System.Text.Encoding.UTF8.GetBytes(password));
         }
     }

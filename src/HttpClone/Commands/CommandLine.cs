@@ -17,8 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
 using CSharpTest.Net.Commands;
-using System.ComponentModel;
+using CSharpTest.Net.Html;
 
 namespace CSharpTest.Net.HttpClone.Commands
 {
@@ -30,44 +31,93 @@ namespace CSharpTest.Net.HttpClone.Commands
     /// </remarks>
     public partial class CommandLine : IDisposable
     {
-        [Command(Visible = false)]
-        public void HtmlHelp([DefaultValue(null)] string name, ICommandInterpreter ci)
+        [Command(Visible = false, Description = "Gets the help for a specific command or lists available commands.")]
+        public void HtmlHelp(ICommandInterpreter _ci)
         {
-            string html = ((CommandInterpreter)ci).GetHtmlHelp(name);
+            CommandInterpreter ci = ((CommandInterpreter)_ci);
+            HtmlLightDocument doc = new HtmlLightDocument(ci.GetHtmlHelp("help"));
+            XmlLightElement e = doc.SelectRequiredNode("/html/body/h1[2]");
+            XmlLightElement body = e.Parent;
+            int i = body.Children.IndexOf(e);
+            body.Children.RemoveRange(i, body.Children.Count - i);
+
+            StringWriter sw = new StringWriter();
+            // Command index
+            sw.WriteLine("<html><body>");
+            sw.WriteLine("<h1>All Commands:</h1>");
+            sw.WriteLine("<blockquote><ul>");
+            ILookup<string, ICommand> categories = ci.Commands.Where(c => c.Visible).ToLookup(c => c.Category ?? "Unk");
+            foreach (IGrouping<string, ICommand> group in categories.OrderBy(g => g.Key))
+            {
+                sw.WriteLine("<li><a href=\"#{0}\">{0}</a></li>", group.Key);
+                sw.WriteLine("<ul>");
+                foreach (ICommand cmd in group)
+                    sw.WriteLine("<li><a href=\"#{0}\">{0}</a> - {1}</li>", cmd.DisplayName, HttpUtility.HtmlEncode(cmd.Description));
+                sw.WriteLine("</ul>");
+            }
+            sw.WriteLine("</ul></blockquote>");
+
+            // Command Help
+            foreach (IGrouping<string, ICommand> group in categories.OrderBy(g => g.Key))
+            {
+                sw.WriteLine("<h2><a name=\"{0}\"></a>{0} Commands:</h2>", group.Key);
+                sw.WriteLine("<blockquote>");
+                foreach (ICommand cmd in group)
+                {
+                    e = new HtmlLightDocument(ci.GetHtmlHelp(cmd.DisplayName)).SelectRequiredNode("/html/body/h3");
+                    sw.WriteLine("<a name=\"{0}\"></a>", cmd.DisplayName);
+                    sw.WriteLine(e.InnerXml);
+                    sw.WriteLine(e.NextSibling.NextSibling.InnerXml);
+                }
+                sw.WriteLine("</blockquote>");
+            }
+
+            e = new HtmlLightDocument(sw.ToString()).SelectRequiredNode("/html/body");
+            body.Children.AddRange(e.Children);
+
+            string html = body.Parent.InnerXml;
             string path = Path.Combine(Path.GetTempPath(), "HttpClone.Help.html");
             File.WriteAllText(path, html);
             System.Diagnostics.Process.Start(path);
         }
 
-        [Command("Help", "-?", "/?", "?", Category = "Built-in", Description = "Gets the help for a specific command or lists available commands.")]
+        [Command("Help", "-?", "/?", "?", Visible = false, Description = "Gets the help for a specific command or lists available commands.")]
         public void Help(
             [Argument("name", "command", "c", "option", "o", Description = "The name of the command or option to show help for.", DefaultValue = null)] 
 			string name,
             ICommandInterpreter ci
             )
         {
-            Dictionary<string, ICommand> cmds = new Dictionary<string, ICommand>(StringComparer.OrdinalIgnoreCase);
-            foreach (ICommand c in ci.Commands)
-                foreach (string nm in c.AllNames)
-                    cmds[nm] = c;
-
             ICommand cmd;
-            if (name != null && cmds.TryGetValue(name, out cmd))
+            if (name != null)
             {
-                cmd.Help();
-            }
-            else
-            {
-                ILookup<string, ICommand> categories = ci.Commands.ToLookup(c => c.Category ?? "Unk");
-                foreach (IGrouping<string, ICommand> group in categories.OrderBy(g => g.Key))
+                Dictionary<string, ICommand> cmds = new Dictionary<string, ICommand>(StringComparer.OrdinalIgnoreCase);
+                foreach (ICommand c in ci.Commands)
+                    foreach (string nm in c.AllNames)
+                        cmds[nm] = c;
+
+                if (cmds.TryGetValue(name, out cmd))
                 {
-                    Console.WriteLine("{0}:", group.Key);
-                    foreach (ICommand item in group)
-                    {
-                        Console.WriteLine("{0,12}: {1}", item.DisplayName, item.Description);
-                    }
-                    Console.WriteLine();
+                    cmd.Help();
+                    return;
                 }
+                Console.WriteLine("Unknown command: {0}", name);
+                Console.WriteLine();
+                Environment.ExitCode = 1;
+            }
+
+            int padding = 4 + ci.Commands.Max(c => c.DisplayName.Length);
+            string format = "{0," + padding + "}: {1}";
+
+            ILookup<string, ICommand> categories = ci.Commands.Where(c=>c.Visible).ToLookup(c => c.Category ?? "Unk");
+            foreach (IGrouping<string, ICommand> group in categories.OrderBy(g => g.Key))
+            {
+                Console.WriteLine("{0}:", group.Key);
+                foreach (ICommand item in group)
+                {
+                    Console.WriteLine(format, item.DisplayName, item.Description);
+                }
+                Console.WriteLine();
             }
         }
 
