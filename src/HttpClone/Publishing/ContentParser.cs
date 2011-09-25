@@ -305,7 +305,7 @@ namespace CSharpTest.Net.HttpClone.Publishing
                 {
                     document.WriteUnformatted(sw);
                 }
-                return sw.ToString();
+                return sw.ToString().Trim();
             }
         }
 

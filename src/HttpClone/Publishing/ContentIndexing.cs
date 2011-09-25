@@ -13,12 +13,11 @@
  */
 #endregion
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using CSharpTest.Net.HttpClone.Common;
 using CSharpTest.Net.HttpClone.Storage;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
@@ -27,8 +26,6 @@ using Lucene.Net.Store;
 using Version = Lucene.Net.Util.Version;
 using CSharpTest.Net.Html;
 using System.Globalization;
-using System.Xml;
-using Lucene.Net.Analysis;
 
 namespace CSharpTest.Net.HttpClone.Publishing
 {
@@ -77,12 +74,23 @@ namespace CSharpTest.Net.HttpClone.Publishing
             if(_config == null)
                 throw new InvalidOperationException("The <search> element is missing from the configuration.");
 
+            Dictionary<string, string> hashes = new Dictionary<string, string>(StringComparer.Ordinal);
+
             foreach (KeyValuePair<string, ContentRecord> item in _content)
             {
+                if (item.Key == SearchTemplate.SearchPath || item.Key == SearchTemplate.TemplatePath 
+                    || item.Key == _config.TemplateUri)
+                    continue;
                 if (item.Value.HasContentStoreId == false)
                     continue;
                 if (!_mimeInfo[item.Value.MimeType].Indexed || _mimeInfo[item.Value.MimeType].Type != ContentFormat.Html)
                     continue;
+                if (item.Value.HasHashContents)
+                {
+                    if (hashes.ContainsKey(item.Value.HashContents))
+                        continue;
+                    hashes.Add(item.Value.HashContents, item.Key);
+                }
 
                 string title = null, blurb = null, date = null;
                 string content = Encoding.UTF8.GetString(_content.ReadContent(item.Value, true));
@@ -113,7 +121,15 @@ namespace CSharpTest.Net.HttpClone.Publishing
                 {
                     StringBuilder tmp = new StringBuilder();
                     foreach (XmlLightElement e in selectFrom.Select(_config.BlubXPath.XPath))
-                        tmp.Append(e.InnerText);
+                    {
+                        if (e.IsText)
+                            tmp.Append(e.Value);
+                        else
+                        {
+                            foreach (XmlLightElement txt in e.Select(".//text()"))
+                                tmp.Append(txt.Value);
+                        }
+                    }
                     if (tmp.Length == 0)
                         tmp.Append(selectFrom.SelectRequiredNode(_config.BlubXPath.XPath).InnerText);
                     blurb = tmp.ToString();

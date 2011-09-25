@@ -14,6 +14,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -33,6 +34,64 @@ namespace CSharpTest.Net.HttpClone.Commands
         {
             using (ContentStorage store = new ContentStorage(StoragePath(url), false))
                 store.Remove(new Uri(url, UriKind.Absolute).NormalizedPathAndQuery());
+        }
+
+        public void DedupContent(string site, [DefaultValue(false)]bool remove, [DefaultValue(false)]bool noPrompt)
+        {
+            using (ContentStorage store = new ContentStorage(StoragePath(site), false))
+            {
+                Dictionary<string, string> replacements = new Dictionary<string, string>(StringComparer.Ordinal);
+                Dictionary<string, string> hashes = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (KeyValuePair<string, ContentRecord> item in store)
+                {
+                    if (item.Value.HasHashContents)
+                    {
+                        string original;
+                        if (hashes.TryGetValue(item.Value.HashContents, out original))
+                        {
+                            replacements[item.Key] = original;
+                            Console.WriteLine("{0,-38} => {1,-38}", item.Key, original);
+                        }
+                        else
+                            hashes.Add(item.Value.HashContents, item.Key);
+                    }
+                }
+
+                if (replacements.Count > 0 &&
+                    (noPrompt || new ConfirmPrompt().Continue("Replace all of the above links")))
+                {
+                    Uri baseUri = new Uri(site, UriKind.Absolute);
+                    ContentParser parser = new ContentParser(store, baseUri);
+                    parser.RewriteUri += u =>
+                    {
+                        string target;
+                        if (u.IsSameHost(baseUri) && replacements.TryGetValue(u.NormalizedPathAndQuery(), out target))
+                            return new Uri(baseUri, target);
+                        return u;
+                    };
+                    parser.ProcessAll();
+
+                    foreach (string removed in replacements.Keys)
+                    {
+                        ContentRecord rec = store[removed];
+                        store.Remove(removed);
+                        if (!remove)
+                        {
+                            ContentRecord.Builder builder = rec.ToBuilder();
+                            builder
+                                .ClearCompressedLength()
+                                .ClearContentLength()
+                                .ClearContentStoreId()
+                                .ClearContentType()
+                                .ClearHashContents()
+                                .SetHttpStatus((uint)HttpStatusCode.Redirect)
+                                .SetContentRedirect(replacements[removed])
+                                ;
+                            store.Add(removed, builder.Build());
+                        }
+                    }
+                }
+            }
         }
 
         public void AddRecursive(string targetLink, string sourceLink)

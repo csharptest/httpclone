@@ -52,9 +52,9 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void DeleteSite(string site)
+        public void DeleteSite(string site, [DefaultValue(false)]bool noPrompt)
         {
-            if (new ConfirmPrompt().Question("Are you sure you want to remove this site", "yes", "no") == "yes")
+            if (noPrompt || new ConfirmPrompt().Question("Are you sure you want to remove this site", "yes", "no") == "yes")
             {
                 foreach (string dname in new[] { "content", "index" })
                 {

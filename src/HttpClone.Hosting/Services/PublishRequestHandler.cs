@@ -122,6 +122,8 @@ namespace CSharpTest.Net.HttpClone.Services
         {
             Check.NotEmpty(location);
             Check.Assert<InvalidDataException>(FileUtils.MakeValidFileName(location) == location);
+            if (!Directory.Exists(TransferDirectory))
+                Directory.CreateDirectory(TransferDirectory);
             return Path.Combine(TransferDirectory, FileUtils.MakeValidFileName(location));
         }
 
