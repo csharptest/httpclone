@@ -26,7 +26,16 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void CreateKeys(string url, [DefaultValue(4096)]int keySize, [DefaultValue(null)] string clientKeyPassword, [DefaultValue(false)] bool noServerPassword)
+        [Command(Category = "Security", Description = "Creates the client/server shared keys used for remote publishing.")]
+        public void CreateKeys(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string url,
+            [Argument("key-size", "k", Description = "The size, in bits, of the RSA cryptographic keys to produce.")]
+            [DefaultValue(4096)]int keySize,
+            [Argument("password", "p", Description = "The client password used for access to the RSA publishing key.")]
+            [DefaultValue(null)] string clientKeyPassword,
+            [Argument("NoServerPassword", Description = "Do not generate or require a password for the server's RSA publishing key.")]
+            [DefaultValue(false)] bool noServerPassword)
         {
             ConfirmPrompt prompt = new ConfirmPrompt();
             string path = StoragePath(url);
@@ -83,7 +92,12 @@ NEXT STEPS:
 ");
         }
 
-        public void ClientKeyPassword(string site, string passwordText)
+        [Command("cPassword", "ClientKeyPassword", Category = "Security", Description = "Specifies the password used to access the client RSA publishing key.")]
+        public void ClientKeyPassword(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("password", "p", Description = "The password to be used.")]
+            string passwordText)
         {
             string keyfile = Path.Combine(StoragePath(site), "client-publishing.key");
             using (RSAKeyPair clientKey = new RSAKeyPair(keyfile, true))
@@ -91,7 +105,12 @@ NEXT STEPS:
 
         }
 
-        public void ServerKeyPassword(string site, string passwordText)
+        [Command("sPassword", "ServerKeyPassword", Category = "Security", Description = "Transmits the server password used to access the RSA publishing key.")]
+        public void ServerKeyPassword(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("password", "p", Description = "The password to be used (obtained from CreateKeys).")]
+            string passwordText)
         {
             HttpRequestUtil util = new HttpRequestUtil(new Uri(site, UriKind.Absolute));
             if (util.Post("/api/publish/set-password/", "application/binary", null, 0) == System.Net.HttpStatusCode.OK)
@@ -105,7 +124,7 @@ NEXT STEPS:
                         return;
                     }
                 }
-                Console.WriteLine("FAILURE: You need verify the key file and restart the server app domain to try again.");
+                Console.WriteLine("FAILURE: You need verify the key file or check the server and try again.");
             }
         }
     }

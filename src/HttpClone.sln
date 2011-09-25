@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebApp", "SampleWebAp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BE484F62-9436-4927-A839-732FE6CD0843}"
 	ProjectSection(SolutionItems) = preProject
+		..\build.bat = ..\build.bat
 		CmdTool.config = CmdTool.config
+		..\example.bat = ..\example.bat
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClone.Hosting", "HttpClone.Hosting\HttpClone.Hosting.csproj", "{AD9411B0-0696-4B02-A353-E9F74A80E697}"

@@ -14,7 +14,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using CSharpTest.Net.Commands;
+using System.ComponentModel;
 
 namespace CSharpTest.Net.HttpClone.Commands
 {
@@ -26,6 +30,47 @@ namespace CSharpTest.Net.HttpClone.Commands
     /// </remarks>
     public partial class CommandLine : IDisposable
     {
+        [Command(Visible = false)]
+        public void HtmlHelp([DefaultValue(null)] string name, ICommandInterpreter ci)
+        {
+            string html = ((CommandInterpreter)ci).GetHtmlHelp(name);
+            string path = Path.Combine(Path.GetTempPath(), "HttpClone.Help.html");
+            File.WriteAllText(path, html);
+            System.Diagnostics.Process.Start(path);
+        }
+
+        [Command("Help", "-?", "/?", "?", Category = "Built-in", Description = "Gets the help for a specific command or lists available commands.")]
+        public void Help(
+            [Argument("name", "command", "c", "option", "o", Description = "The name of the command or option to show help for.", DefaultValue = null)] 
+			string name,
+            ICommandInterpreter ci
+            )
+        {
+            Dictionary<string, ICommand> cmds = new Dictionary<string, ICommand>(StringComparer.OrdinalIgnoreCase);
+            foreach (ICommand c in ci.Commands)
+                foreach (string nm in c.AllNames)
+                    cmds[nm] = c;
+
+            ICommand cmd;
+            if (name != null && cmds.TryGetValue(name, out cmd))
+            {
+                cmd.Help();
+            }
+            else
+            {
+                ILookup<string, ICommand> categories = ci.Commands.ToLookup(c => c.Category ?? "Unk");
+                foreach (IGrouping<string, ICommand> group in categories.OrderBy(g => g.Key))
+                {
+                    Console.WriteLine("{0}:", group.Key);
+                    foreach (ICommand item in group)
+                    {
+                        Console.WriteLine("{0,12}: {1}", item.DisplayName, item.Description);
+                    }
+                    Console.WriteLine();
+                }
+            }
+        }
+
         string StoragePath(string site)
         {
             Uri url = new Uri(site, UriKind.Absolute);

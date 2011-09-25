@@ -30,7 +30,7 @@ namespace CSharpTest.Net.HttpClone
             {
                 using (CommandLine commands = new CommandLine())
                 {
-                    CommandInterpreter ci = new CommandInterpreter(DefaultCommands.Help | DefaultCommands.Echo, commands);
+                    CommandInterpreter ci = new CommandInterpreter(DefaultCommands.None, commands);
                     if (arguments.Length > 0)
                     {
                         List<string> args = new List<string>(arguments);

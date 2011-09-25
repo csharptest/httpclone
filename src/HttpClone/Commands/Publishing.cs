@@ -17,7 +17,6 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.ComponentModel;
-using CSharpTest.Net.Commands;
 using CSharpTest.Net.Threading;
 using CSharpTest.Net.HttpClone.Common;
 using CSharpTest.Net.HttpClone.Publishing;
@@ -28,10 +27,34 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
+        private void GetClientPassword(SitePublisher pub)
+        {
+            if (!pub.HasClientPassword)
+            {
+                using (new ConsoleEchoOff())
+                {
+                    for (int i = 2; i >= 0; i--)
+                    {
+                        try
+                        {
+                            Console.Write("Enter client password: ");
+                            pub.SetClientPassword(Console.ReadLine());
+                            break;
+                        }
+                        catch
+                        { if (i == 0) throw; }
+                        finally
+                        { Console.WriteLine(); }
+                    }
+                }
+            }
+        }
+
         public void Publish(string site)
         {
             using (SitePublisher index = new SitePublisher(StoragePath(site), site))
             {
+                GetClientPassword(index);
                 index.Publish();
             }
         }
@@ -40,6 +63,7 @@ namespace CSharpTest.Net.HttpClone.Commands
         {
             using (SitePublisher index = new SitePublisher(StoragePath(siteToPublish), siteToPublish))
             {
+                GetClientPassword(index);
                 index.Publish(new Uri(destinationUrl, UriKind.Absolute));
             }
         }

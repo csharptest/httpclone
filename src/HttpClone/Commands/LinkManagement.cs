@@ -16,8 +16,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Text.RegularExpressions;
 using CSharpTest.Net.Commands;
+using CSharpTest.Net.HttpClone.Common;
 using CSharpTest.Net.HttpClone.Publishing;
 using CSharpTest.Net.HttpClone.Storage;
 
@@ -25,7 +27,12 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void List(string site, [DefaultValue(false)]bool details)
+        [Command(Category = "Hyperlinks", Description = "Lists all the known pages for the specified site.")]
+        public void List(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("verbose", "v", Description = "Display detailed information about each page or link.")]
+            [DefaultValue(false)]bool details)
         {
             string prefix = new Uri(site, UriKind.Absolute).NormalizedPathAndQuery();
             using (ContentStorage storage = new ContentStorage(StoragePath(site), true))
@@ -53,18 +60,33 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void Links(string site, [DefaultValue(true)]bool details, [DefaultValue(true)]bool showInternal, [DefaultValue(true)]bool showExternal, [DefaultValue(false)]bool validate)
+        [Command(Category = "Hyperlinks", Description = "Lists all the known links for the specified site.")]
+        public void Links(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("verbose", "v", Description = "Display detailed information about each link.")]
+            [DefaultValue(true)]bool details,
+            [Argument("internal", "i", Description = "Set to false or 0 to omit internal links.")]
+            [DefaultValue(true)]bool showInternal,
+            [Argument("external", "e", Description = "Set to false or 0 to omit external links.")]
+            [DefaultValue(true)]bool showExternal,
+            [Argument("validate", Description = "Check each link and print the status information.")]
+            [DefaultValue(false)]bool validate)
         {
             if (details)
                 Console.WriteLine("Count Target");
 
             using (ContentStorage storage = new ContentStorage(StoragePath(site), true))
             {
+                Uri baseUri = new Uri(site, UriKind.Absolute);
                 Dictionary<string, int> links = new Dictionary<string, int>(StringComparer.Ordinal);
-                ContentParser parser = new ContentParser(storage, new Uri(site, UriKind.Absolute));
+                ContentParser parser = new ContentParser(storage, baseUri);
                 parser.VisitUri += u =>
                 {
                     int count;
+                    if ((!showInternal && u.IsSameHost(baseUri)) || (!showExternal && !u.IsSameHost(baseUri)))
+                        return;
+
                     links.TryGetValue(u.OriginalString, out count);
                     links[u.OriginalString] = count + 1;
                 };
@@ -74,12 +96,35 @@ namespace CSharpTest.Net.HttpClone.Commands
                 keys.Sort();
                 foreach (string key in keys)
                 {
-                    Console.WriteLine("{0,5:n0} {1}", links[key], key);
+                    if (validate)
+                    {
+                        Uri fetch = new Uri(key, UriKind.Absolute);
+                        HttpStatusCode result;
+                        if(fetch.IsSameHost(baseUri))
+                        {
+                            ContentRecord rec;
+                            result = storage.TryGetValue(fetch.NormalizedPathAndQuery(), out rec)
+                                ? (HttpStatusCode)rec.HttpStatus
+                                : HttpStatusCode.NotFound;
+                        }
+                        else
+                            result = new HttpRequestUtil(fetch).Head(fetch.PathAndQuery);
+                        Console.WriteLine("{0,3} {1,-20} {2}", (int)result, result, fetch);
+                    }
+                    else if(details)
+                        Console.WriteLine("{0,5:n0} {1}", links[key], key);
+                    else
+                        Console.WriteLine("{0}", key);
                 }
             }
         }
 
-        public void LinkSource(string site, string link)
+        [Command(Category = "Hyperlinks", Description = "Tracks down all pages that reference a specified link.")]
+        public void LinkSource(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("link", "l", Description = "The target link to search for.")]
+            string link)
         {
             using (ContentStorage storage = new ContentStorage(StoragePath(site), true))
             {
@@ -95,7 +140,14 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void Relink(string site, string sourceLink, string targetLink)
+        [Command(Category = "Hyperlinks", Description = "Changes all links from one url to another.")]
+        public void Relink(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("from", "f", Description = "The original link you want to change.")]
+            string sourceLink,
+            [Argument("to", "t", Description = "The new link you want to use instead.")]
+            string targetLink)
         {
             Uri sourceUri = new Uri(sourceLink, UriKind.Absolute);
             Uri targetUri = new Uri(targetLink, UriKind.Absolute);
@@ -113,7 +165,14 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void RelinkMatching(string site, string expression, string targetLink)
+        [Command(Category = "Hyperlinks", Description = "Changes all links matching an expression to another link.")]
+        public void RelinkEx(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("expression", "e", Description = "A regular expression to match against the links.")]
+            string expression,
+            [Argument("to", "t", Description = "The new link you want to use for any matching links.")]
+            string targetLink)
         {
             Regex match = new Regex(expression, RegexOptions.Singleline);
             Uri targetUri = new Uri(targetLink, UriKind.Absolute);

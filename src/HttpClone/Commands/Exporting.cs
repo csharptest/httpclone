@@ -23,7 +23,10 @@ namespace CSharpTest.Net.HttpClone.Commands
 {
     partial class CommandLine
     {
-        public void Archive(string site)
+        [Command(Category = "Exporting", Description = "Creates a zip file that can be transfered manually to a server or used as a backup.")]
+        public void Archive(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site)
         {
             using (SitePublisher index = new SitePublisher(StoragePath(site), site))
             {
@@ -31,7 +34,14 @@ namespace CSharpTest.Net.HttpClone.Commands
             }
         }
 
-        public void Export(string site, string directory, [DefaultValue(true)] bool rebase)
+        [Command(Category = "Exporting", Description = "Exports the website copy as html to a local directory.")]
+        public void Export(
+            [Argument("site", "s", Description = "The root http address of the website copy.")]
+            string site,
+            [Argument("path", "p", Description = "The directory to export to.")]
+            string directory,
+            [Argument("rebase", Description = "Changes the fully-qualified links to use file: references.")]
+            [DefaultValue(true)] bool rebase)
         {
             if (String.IsNullOrEmpty(directory) || File.Exists(directory))
                 throw new ArgumentException("Please specify a valid directory.");

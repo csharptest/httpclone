@@ -57,6 +57,8 @@ namespace CSharpTest.Net.HttpClone.Publishing
             _rsaKeyPair.Dispose();
         }
 
+        public bool HasClientPassword { get { try { GC.KeepAlive(_rsaKeyPair.ClientPrivateKey); return true; } catch { return false; } } }
+
         public void CreateArchive()
         {
             string filename = CreateArchiveFile();
@@ -132,6 +134,11 @@ namespace CSharpTest.Net.HttpClone.Publishing
         void ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
             Console.Write("\rSending archive to server: {0,3}%", e.ProgressPercentage);
+        }
+
+        public void SetClientPassword(string password)
+        {
+            _rsaKeyPair.SetClientPassword(System.Text.Encoding.UTF8.GetBytes(password));
         }
     }
 }

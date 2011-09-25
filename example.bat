@@ -24,8 +24,8 @@ src\bin\httpclone.exe addrecursive http://localhost:11080/style.css http://s0.wp
 
 REM 	After importing these styles, we want to map all style references to use these locations instead
 REM 	of their original addresses.
-src\bin\httpclone.exe relinkmatching http://localhost:11080 ^http://s0\.wp\.com/wp-content/themes/h4/global.css http://localhost:11080/global.css
-src\bin\httpclone.exe relinkmatching http://localhost:11080 ^http://s0\.wp\.com/wp-content/themes/pub/titan/style.css http://localhost:11080/style.css
+src\bin\httpclone.exe relinkex http://localhost:11080 ^http://s0\.wp\.com/wp-content/themes/h4/global.css http://localhost:11080/global.css
+src\bin\httpclone.exe relinkex http://localhost:11080 ^http://s0\.wp\.com/wp-content/themes/pub/titan/style.css http://localhost:11080/style.css
 
 REM 	Before we go any further, let's apply all our content filtering rules we defined for each document
 REM 	type in the configuration.  This will help us in the next step to identify duplcate pages.
