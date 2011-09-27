@@ -18,6 +18,7 @@ using System.Net;
 using CSharpTest.Net.IO;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace CSharpTest.Net.HttpClone.Common
 {
@@ -128,14 +129,7 @@ namespace CSharpTest.Net.HttpClone.Common
                     }
                 }
 
-                response = (HttpWebResponse)req.GetResponse();
-            }
-            catch (WebException we)
-            {
-                response = we.Response as HttpWebResponse;
-                if (response == null)
-                    throw;
-                Log.Verbose("{0} {1}", (int)response.StatusCode, path);
+                response = GetResponse(req);
             }
             finally
             {
@@ -160,21 +154,6 @@ namespace CSharpTest.Net.HttpClone.Common
                 if (StatusCode == HttpStatusCode.Redirect || StatusCode == HttpStatusCode.Moved || StatusCode == HttpStatusCode.SeeOther)
                     RedirectUri = new Uri(RequestUri, headers[HttpResponseHeader.Location]);
 
-                if (StatusCode == HttpStatusCode.OK && response.ContentLength == 0 && headers["Refresh"] != null && 
-                    headers["Refresh"].IndexOf("url=", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    string redir = headers["Refresh"].Substring(
-                        headers["Refresh"].IndexOf("url=", StringComparison.OrdinalIgnoreCase) + 4).Trim();
-                    Uri uriRedirect;
-                    if (Uri.TryCreate(RequestUri, redir, out uriRedirect))
-                    {
-                        RedirectUri = uriRedirect;
-                        StatusCode = HttpStatusCode.Redirect;
-                    }
-                    else
-                        StatusCode = HttpStatusCode.InternalServerError;
-                }
-
                 if (method == "HEAD")
                     Content = new byte[0];
                 else
@@ -196,9 +175,44 @@ namespace CSharpTest.Net.HttpClone.Common
                             || (headers[HttpResponseHeader.TransferEncoding] ?? "").IndexOf("gzip", StringComparison.OrdinalIgnoreCase) >= 0)
                             Content = Content.Decompress();
                     }
+
+                    if (StatusCode == HttpStatusCode.OK && Content.Length == 0)
+                    {                       
+                        Uri uriRedirect;
+                        Match m;
+
+                        if (!String.IsNullOrEmpty(ResponseHeaders["Refresh"])
+                            && (m = Regex.Match(ResponseHeaders["Refresh"], @"^\d+\s*;\s*url\s*=\s*([^\s]+)\s*$")).Success
+                            && Uri.TryCreate(RequestUri, m.Groups[1].Value, out uriRedirect))
+                        {
+                            RedirectUri = uriRedirect;
+                            StatusCode = HttpStatusCode.Redirect;
+                        }
+                        else
+                        {
+                            Log.Warning("The server returned emtpy content for the url = {0}", RequestUri);
+                        }
+                    }
                 }
 
                 return StatusCode;
+            }
+        }
+
+        [System.Diagnostics.DebuggerNonUserCode]
+        private static HttpWebResponse GetResponse(HttpWebRequest request)
+        {
+            try
+            {
+                return (HttpWebResponse)request.GetResponse();
+            }
+            catch (WebException we)
+            {
+                HttpWebResponse response = we.Response as HttpWebResponse;
+                if (response == null)
+                    throw;
+                Log.Verbose("{0} {1}", (int)response.StatusCode, request.RequestUri);
+                return response;
             }
         }
 

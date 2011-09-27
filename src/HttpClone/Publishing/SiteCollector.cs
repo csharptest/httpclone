@@ -245,7 +245,9 @@ namespace CSharpTest.Net.HttpClone.Publishing
         public void SetContents(string path, HttpStatusCode status, string contentType, string etag, DateTime? modified, byte[] contents)
         {
             if (contents.Length == 0)
-                throw new ApplicationException("Server returned empty content.");
+            {
+                Console.Error.WriteLine("{0} - {1}  (Content is empty)", (int)status, path);
+            }
 
             ContentRecord rec = _data[path];
             ITransactable pendingUpdate = null;
